@@ -9,15 +9,14 @@ import Section4 from "../components/home-1/Section4";
 import Section5 from "../components/home-1/Section5";
 import Section6 from "../components/home-1/Section6";
 import Section7 from "../components/home-1/Section7";
-
 import Section8 from "../components/home-1/Section8";
 import Section9 from "../components/home-1/Section9";
 import AppLayout from "../components/layout/AppLayout";
-
+import db from "../utils/db";
 import {useQuery} from '@apollo/client';
 import { VIEWER } from '../apollo/client/queries';
 
-const IndexPage = () => {
+const IndexPages = () => {
     const { data } = useQuery(VIEWER);
     const viewer = data?.viewer;
     console.log(viewer)
@@ -42,7 +41,7 @@ const IndexPage = () => {
   );
 };
 
-IndexPage.layout = AppLayout;
+IndexPages.layout = AppLayout;
 
 // export async function getServerSideProps() {
 //     return {
@@ -51,4 +50,17 @@ IndexPage.layout = AppLayout;
 //         },
 //     };
 // }
-// export default IndexPage;
+
+
+
+export async function getServerSideProps() {
+  await db.connect();
+  // @ts-ignore
+  const products = await Product.find().lean();
+  return {
+    props: {
+      products: products.map(db.convertDocToObj),
+    },
+  };
+}
+export default IndexPages;
